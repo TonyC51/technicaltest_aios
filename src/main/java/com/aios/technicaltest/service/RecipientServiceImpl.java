@@ -1,5 +1,7 @@
 package com.aios.technicaltest.service;
 
+import com.aios.technicaltest.exceptions.CustomException;
+import com.aios.technicaltest.exceptions.ExceptionType;
 import com.aios.technicaltest.model.Recipient;
 import com.aios.technicaltest.payload.RecipientPayload;
 import com.aios.technicaltest.repository.RecipientRepository;
@@ -21,8 +23,7 @@ public class RecipientServiceImpl implements RecipientService {
     @Override
     public Recipient createRecipient(RecipientPayload payload) {
         if (recipientRepository.existsByName(payload.getName())) {
-            //TODO exception
-            return null;
+            throw new CustomException(ExceptionType.RECIPIENT_ALREADY_EXISTS);
         }
         Recipient recipient = mapDtoToDbo(payload);
         if (recipient != null) {

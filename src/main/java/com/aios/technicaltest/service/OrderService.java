@@ -1,18 +1,19 @@
 package com.aios.technicaltest.service;
 
-import com.aios.technicaltest.payload.OrderPayload;
+import com.aios.technicaltest.payload.OrderRequestPayload;
+import com.aios.technicaltest.payload.OrderResponsePayload;
 import java.util.List;
 
 public interface OrderService {
     
-    public OrderPayload createOrder(OrderPayload order, Long recipientId);
+    public OrderResponsePayload createOrder(OrderRequestPayload order, Long recipientId);
     
-    public OrderPayload updateOrder(OrderPayload order);
+    public OrderResponsePayload updateOrder(OrderRequestPayload order);
     
     public boolean deleteOrder(Long id);
 
-    public List<OrderPayload> getAllOrders();
+    public List<OrderResponsePayload> getAllOrders();
 
-    public OrderPayload getOrderById(Long id);
+    public OrderResponsePayload getOrderById(Long id);
     
 }

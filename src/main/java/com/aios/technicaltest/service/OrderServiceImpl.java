@@ -1,8 +1,11 @@
 package com.aios.technicaltest.service;
 
+import com.aios.technicaltest.exceptions.CustomException;
+import com.aios.technicaltest.exceptions.ExceptionType;
 import com.aios.technicaltest.model.Order;
 import com.aios.technicaltest.model.Recipient;
-import com.aios.technicaltest.payload.OrderPayload;
+import com.aios.technicaltest.payload.OrderRequestPayload;
+import com.aios.technicaltest.payload.OrderResponsePayload;
 import com.aios.technicaltest.repository.OrderRepository;
 import com.aios.technicaltest.repository.RecipientRepository;
 import java.math.BigDecimal;
@@ -28,18 +31,16 @@ public class OrderServiceImpl implements OrderService {
     private RecipientRepository recipientRepository;
 
     @Override
-    public OrderPayload createOrder(OrderPayload payload, Long recipientId) {
+    public OrderResponsePayload createOrder(OrderRequestPayload payload, Long recipientId) {
         
         // check for quantity
         if (payload.getQuantity() < 0 || payload.getQuantity() > 10000) {
-            return null;
-            //TODO exception
+            throw new CustomException(ExceptionType.QUANTITY_SHOUD_BE_BETWEEN_0_AND_10000);
         }
         
         // check for 25 multiple
         if (payload.getQuantity() % 25 != 0) {
-            return null;
-            //TODO exception
+            throw new CustomException(ExceptionType.QUANTITY_SHOULD_BE_MULTIPLE_OF_25);
         }
         
         // check for dates
@@ -47,8 +48,7 @@ public class OrderServiceImpl implements OrderService {
         Instant oneWeekLater = ZonedDateTime.now().plusWeeks(1).toInstant();
        
         if (oneWeekLater.isAfter(askedDate)) {
-            return null;
-            //TODO exception
+            throw new CustomException(ExceptionType.DATE_SHOULD_BE_IN_ATLEAST_ONE_WEEK);
         }
 
         // map from API to base 
@@ -62,9 +62,7 @@ public class OrderServiceImpl implements OrderService {
             Optional<Recipient> recipient = recipientRepository.findById(recipientId);
             
             if (recipient.isPresent()) {
-                
                 recipient.get().getOrders().add(order);
-                //order.setRecipient(recipient.get());
                 recipientRepository.save(recipient.get());
                 return mapDboToDto(order);
             }
@@ -72,7 +70,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderPayload updateOrder(OrderPayload payload) {
+    public OrderResponsePayload updateOrder(OrderRequestPayload payload) {
         Order order = mapDtoToDbo(payload);
         if (order != null) {
             order = orderRepository.save(mapDtoToDbo(payload));
@@ -92,20 +90,20 @@ public class OrderServiceImpl implements OrderService {
     }
     
     @Override
-    public List<OrderPayload> getAllOrders() {
+    public List<OrderResponsePayload> getAllOrders() {
         List<Order> orders = orderRepository.findAll();
-        return orders.stream().map(o -> (new OrderPayload(o))).collect(Collectors.toList());
+        return orders.stream().map(o -> (new OrderResponsePayload(o))).collect(Collectors.toList());
     }
 
     @Override
-    public OrderPayload getOrderById(Long id) {
+    public OrderResponsePayload getOrderById(Long id) {
         Optional<Order> order = orderRepository.findById(id);
         if (order.isPresent()) {
-            return new OrderPayload(order.get());
+            return new OrderResponsePayload(order.get());
         } return null;
     }
     
-    private Order mapDtoToDbo (OrderPayload payload) {
+    private Order mapDtoToDbo (OrderRequestPayload payload) {
         Order result;
         try {
             result = new Order(payload);
@@ -116,15 +114,14 @@ public class OrderServiceImpl implements OrderService {
         }
     }
     
-    private OrderPayload mapDboToDto (Order order) {
-        OrderPayload result;
+    private OrderResponsePayload mapDboToDto (Order order) {
+        OrderResponsePayload result;
         try {
-            result = new OrderPayload(order);
+            result = new OrderResponsePayload(order);
             return result;
         } catch (Exception e) {
             logger.error("An exception occured during Order payload matching", e.getLocalizedMessage());
             return null;
         }
-    }
-    
+    } 
 }

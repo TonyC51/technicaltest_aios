@@ -1,6 +1,6 @@
 package com.aios.technicaltest.model;
 
-import com.aios.technicaltest.payload.OrderPayload;
+import com.aios.technicaltest.payload.OrderRequestPayload;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -10,11 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "banana_order")
@@ -23,12 +19,6 @@ public class Order implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    
-//    @ManyToOne
-//    @JoinColumn(name= "recipient", nullable=false)
-//    @OnDelete(action = OnDeleteAction.CASCADE)
-//    @JsonIgnore
-//    private Recipient recipient;
     
     @Column(name = "delivery_date", nullable=false)
     @JsonFormat(pattern="yyyy-MM-dd")
@@ -41,17 +31,15 @@ public class Order implements Serializable {
     private BigDecimal price;
 
     public Order(Date deliveryDate, Integer quantity, BigDecimal price) {
-        //this.recipient = recipient;
         this.deliveryDate = deliveryDate;
         this.quantity = quantity;
         this.price = price;
     }
     
-    public Order(OrderPayload orderPayload) {
+    public Order(OrderRequestPayload orderPayload) {
         this.id = orderPayload.getId();
         this.deliveryDate = orderPayload.getDeliveryDate();
         this.quantity = orderPayload.getQuantity();
-        this.price = orderPayload.getPrice();
     }
     
     public Order() {
@@ -60,14 +48,6 @@ public class Order implements Serializable {
     public Long getId() {
         return id;
     }
-
-//    public Recipient getRecipient() {
-//        return recipient;
-//    }
-//
-//    public void setRecipient(Recipient recipient) {
-//        this.recipient = recipient;
-//    }
 
     public Date getDeliveryDate() {
         return deliveryDate;
