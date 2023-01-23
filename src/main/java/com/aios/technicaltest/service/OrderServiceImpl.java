@@ -114,7 +114,8 @@ public class OrderServiceImpl implements OrderService {
         }
     }
     
-    private OrderResponsePayload mapDboToDto (Order order) {
+    @Override
+    public OrderResponsePayload mapDboToDto (Order order) {
         OrderResponsePayload result;
         try {
             result = new OrderResponsePayload(order);

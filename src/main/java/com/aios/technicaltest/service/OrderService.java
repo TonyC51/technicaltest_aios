@@ -1,5 +1,6 @@
 package com.aios.technicaltest.service;
 
+import com.aios.technicaltest.model.Order;
 import com.aios.technicaltest.payload.OrderRequestPayload;
 import com.aios.technicaltest.payload.OrderResponsePayload;
 import java.util.List;
@@ -15,5 +16,7 @@ public interface OrderService {
     public List<OrderResponsePayload> getAllOrders();
 
     public OrderResponsePayload getOrderById(Long id);
+    
+    public OrderResponsePayload mapDboToDto (Order order);
     
 }

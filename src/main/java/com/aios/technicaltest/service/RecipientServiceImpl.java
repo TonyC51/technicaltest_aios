@@ -61,7 +61,8 @@ public class RecipientServiceImpl implements RecipientService {
         return recipient.orElse(null);
     }
     
-    private Recipient mapDtoToDbo (RecipientPayload payload) {
+    @Override
+    public Recipient mapDtoToDbo (RecipientPayload payload) {
         Recipient result;
         try {
             result = new Recipient(payload);
