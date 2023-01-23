@@ -12,9 +12,9 @@ public class RecipientPayload {
     private Long zipCode;
     private String city;
     private String country;
-    private List<OrderRequestPayload> orders;
+    private List<OrderPayload> orders;
     
-    public RecipientPayload(Long id, String name, String address, Long zipCode, String city, String country, List<OrderRequestPayload> orders) {
+    public RecipientPayload(Long id, String name, String address, Long zipCode, String city, String country, List<OrderPayload> orders) {
         this.name = name;
         this.address = address;
         this.zipCode = zipCode;
@@ -24,6 +24,7 @@ public class RecipientPayload {
     }
     
     public RecipientPayload(Recipient recipient) {
+        this.id = recipient.getId();
         this.name = recipient.getName();
         this.address = recipient.getAdress();
         this.zipCode = recipient.getZipCode();
@@ -31,7 +32,7 @@ public class RecipientPayload {
         this.country = recipient.getCountry();
         this.orders = recipient.getOrders()
                 .stream()
-                .map(o -> new OrderRequestPayload(o))
+                .map(o -> new OrderPayload(o))
                 .collect(Collectors.toList());
     }
     
@@ -86,11 +87,11 @@ public class RecipientPayload {
         this.country = country;
     }
 
-    public List<OrderRequestPayload> getOrders() {
+    public List<OrderPayload> getOrders() {
         return orders;
     }
 
-    public void setOrders(List<OrderRequestPayload> orders) {
+    public void setOrders(List<OrderPayload> orders) {
         this.orders = orders;
     }
 }

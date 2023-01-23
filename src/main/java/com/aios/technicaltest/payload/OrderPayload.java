@@ -4,29 +4,39 @@ import com.aios.technicaltest.model.Order;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OrderResponsePayload {
+public class OrderPayload {
     
     private Long id;
     private Date deliveryDate;
     private Integer quantity;
     private BigDecimal price;
-
+    private Long recipientId;
     
-    public OrderResponsePayload() {
+    public OrderPayload() {
     }
     
-    public OrderResponsePayload(Long id, Date deliveryDate, Integer quantity, BigDecimal price) {
+    public OrderPayload(Long id, Date deliveryDate, Integer quantity, BigDecimal price, Long recipientId) {
         this.id = id;
         this.deliveryDate = deliveryDate;
         this.quantity = quantity;
         this.price = price;
+        this.recipientId = recipientId;
+    }
+    
+    public OrderPayload(Long id, Date deliveryDate, Integer quantity, Long recipientId) {
+        this.id = id;
+        this.deliveryDate = deliveryDate;
+        this.quantity = quantity;
+        this.price = price;
+        this.recipientId = recipientId;
     }
 
-    public OrderResponsePayload(Order order) {
+    public OrderPayload(Order order) {
         this.id = order.getId();
         this.deliveryDate = order.getDeliveryDate();
         this.quantity = order.getQuantity();
         this.price = order.getPrice();
+        this.recipientId = order.getRecipientId();
     }
     
     public BigDecimal getPrice() {
@@ -59,5 +69,13 @@ public class OrderResponsePayload {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+    
+    public Long getRecipientId() {
+        return recipientId;
+    }
+
+    public void setRecipientId(Long recipientId) {
+        this.recipientId = recipientId;
     }
 }

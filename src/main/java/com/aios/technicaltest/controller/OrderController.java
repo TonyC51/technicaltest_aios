@@ -1,7 +1,6 @@
 package com.aios.technicaltest.controller;
 
-import com.aios.technicaltest.payload.OrderRequestPayload;
-import com.aios.technicaltest.payload.OrderResponsePayload;
+import com.aios.technicaltest.payload.OrderPayload;
 import com.aios.technicaltest.service.OrderService;
 import com.aios.technicaltest.utils.ApiUrl;
 import java.util.List;
@@ -23,22 +22,22 @@ public class OrderController {
     private OrderService orderService;
     
     @PostMapping(ApiUrl.BY_ID)
-    public OrderResponsePayload createOrder(@PathVariable Long id, @RequestBody OrderRequestPayload payload) {
+    public OrderPayload createOrder(@PathVariable Long id, @RequestBody OrderPayload payload) {
         return orderService.createOrder(payload, id);
     }
     
     @PutMapping("")
-    public OrderResponsePayload updateOrder(@RequestBody OrderRequestPayload recipient) {
-        return orderService.updateOrder(recipient);
+    public OrderPayload updateOrder(@RequestBody OrderPayload recipient) {
+        return orderService.updateOrder(recipient, recipient.getRecipientId());
     }
     
     @GetMapping(ApiUrl.BY_ID)
-    public OrderResponsePayload getOrderById(@PathVariable Long id) {
+    public OrderPayload getOrderById(@PathVariable Long id) {
         return orderService.getOrderById(id);
     }
     
     @GetMapping("")
-    public List<OrderResponsePayload> getAllOrders() {
+    public List<OrderPayload> getAllOrders() {
         return orderService.getAllOrders();
     }
     

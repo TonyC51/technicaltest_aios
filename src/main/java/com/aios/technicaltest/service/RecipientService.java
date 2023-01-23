@@ -6,16 +6,21 @@ import java.util.List;
 
 public interface RecipientService {
     
-    public Recipient createRecipient (RecipientPayload recipient);
+    public RecipientPayload createRecipient (RecipientPayload recipient);
     
-    public Recipient updateRecipient (RecipientPayload recipient);
+    public RecipientPayload updateRecipient (RecipientPayload recipient);
     
     public boolean deleteRecipient(Long id);
     
-    public List<Recipient> getAllRecipients();
+    public List<RecipientPayload> getAllRecipients();
     
-    public Recipient getRecipientById(Long id);
+    public RecipientPayload getRecipientById(Long id);
     
     public Recipient mapDtoToDbo (RecipientPayload payload);
+    
+    public RecipientPayload mapDboToDto (Recipient recipient);
+    
+    public List<RecipientPayload> mapDboListToDtoList (List<Recipient> recipients);
+
     
 }

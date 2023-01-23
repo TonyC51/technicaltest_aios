@@ -1,16 +1,11 @@
 package com.aios.technicaltest.service;
 
-import com.aios.technicaltest.exceptions.CustomException;
-import com.aios.technicaltest.exceptions.ExceptionType;
 import com.aios.technicaltest.model.Order;
 import com.aios.technicaltest.model.Recipient;
-import com.aios.technicaltest.payload.OrderRequestPayload;
-import com.aios.technicaltest.payload.OrderResponsePayload;
+import com.aios.technicaltest.payload.OrderPayload;
 import com.aios.technicaltest.repository.OrderRepository;
 import com.aios.technicaltest.repository.RecipientRepository;
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.ZonedDateTime;
+import com.aios.technicaltest.utils.Utils;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,53 +24,18 @@ public class OrderServiceImpl implements OrderService {
     
     @Autowired
     private RecipientRepository recipientRepository;
+    
+    @Autowired
+    private Utils utils;
 
     @Override
-    public OrderResponsePayload createOrder(OrderRequestPayload payload, Long recipientId) {
-        
-        // check for quantity
-        if (payload.getQuantity() < 0 || payload.getQuantity() > 10000) {
-            throw new CustomException(ExceptionType.QUANTITY_SHOUD_BE_BETWEEN_0_AND_10000);
-        }
-        
-        // check for 25 multiple
-        if (payload.getQuantity() % 25 != 0) {
-            throw new CustomException(ExceptionType.QUANTITY_SHOULD_BE_MULTIPLE_OF_25);
-        }
-        
-        // check for dates
-        Instant askedDate = payload.getDeliveryDate().toInstant();
-        Instant oneWeekLater = ZonedDateTime.now().plusWeeks(1).toInstant();
-       
-        if (oneWeekLater.isAfter(askedDate)) {
-            throw new CustomException(ExceptionType.DATE_SHOULD_BE_IN_ATLEAST_ONE_WEEK);
-        }
-
-        // map from API to base 
-        Order order = mapDtoToDbo(payload);
-        
-        if (order != null) {
-            
-            // calculate price
-            order.setPrice(new BigDecimal(order.getQuantity().doubleValue() * 2.5));
-            
-            Optional<Recipient> recipient = recipientRepository.findById(recipientId);
-            
-            if (recipient.isPresent()) {
-                recipient.get().getOrders().add(order);
-                recipientRepository.save(recipient.get());
-                return mapDboToDto(order);
-            }
-        } return null;
+    public OrderPayload createOrder(OrderPayload payload, Long recipientId) {
+        return checkConditionLinkModelAndPersist(payload, recipientId);
     }
 
     @Override
-    public OrderResponsePayload updateOrder(OrderRequestPayload payload) {
-        Order order = mapDtoToDbo(payload);
-        if (order != null) {
-            order = orderRepository.save(mapDtoToDbo(payload));
-            return mapDboToDto(order); 
-        } return null;
+    public OrderPayload updateOrder(OrderPayload payload, Long recipientId) {
+        return checkConditionLinkModelAndPersist(payload, recipientId);
     }
 
     @Override
@@ -90,20 +50,20 @@ public class OrderServiceImpl implements OrderService {
     }
     
     @Override
-    public List<OrderResponsePayload> getAllOrders() {
+    public List<OrderPayload> getAllOrders() {
         List<Order> orders = orderRepository.findAll();
-        return orders.stream().map(o -> (new OrderResponsePayload(o))).collect(Collectors.toList());
+        return orders.stream().map(o -> (new OrderPayload(o))).collect(Collectors.toList());
     }
 
     @Override
-    public OrderResponsePayload getOrderById(Long id) {
+    public OrderPayload getOrderById(Long id) {
         Optional<Order> order = orderRepository.findById(id);
         if (order.isPresent()) {
-            return new OrderResponsePayload(order.get());
+            return new OrderPayload(order.get());
         } return null;
     }
     
-    private Order mapDtoToDbo (OrderRequestPayload payload) {
+    private Order mapDtoToDbo (OrderPayload payload) {
         Order result;
         try {
             result = new Order(payload);
@@ -115,14 +75,40 @@ public class OrderServiceImpl implements OrderService {
     }
     
     @Override
-    public OrderResponsePayload mapDboToDto (Order order) {
-        OrderResponsePayload result;
+    public OrderPayload mapDboToDto (Order order) {
+        OrderPayload result;
         try {
-            result = new OrderResponsePayload(order);
+            result = new OrderPayload(order);
             return result;
         } catch (Exception e) {
             logger.error("An exception occured during Order payload matching", e.getLocalizedMessage());
             return null;
         }
-    } 
+    }
+    
+    private OrderPayload checkConditionLinkModelAndPersist (OrderPayload payload, Long recipientId) {
+        
+        // handle condition checking for business
+        utils.checkBusinessConditions(payload);
+
+        // map from API to base 
+        Order order = mapDtoToDbo(payload);
+        
+        if (order != null) {
+            
+            // apply price
+            utils.applyPrice(order);
+            
+            Optional<Recipient> recipient = recipientRepository.findById(recipientId);
+            
+            if (recipient.isPresent()) {
+                recipient.get().getOrders().add(order);
+                order.setRecipientId(recipientId);
+                order.setRecipient(recipient.get());
+                recipientRepository.save(recipient.get());
+                return mapDboToDto(order);
+            }
+        } return null;
+    
+}
 }
