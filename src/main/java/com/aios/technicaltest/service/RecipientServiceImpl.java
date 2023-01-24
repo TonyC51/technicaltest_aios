@@ -71,7 +71,7 @@ public class RecipientServiceImpl implements RecipientService {
             result = new Recipient(payload);
             return result;
         } catch (Exception e) {
-            logger.error("An exception occured during Recipient payload matching", e.getLocalizedMessage());
+            logger.error("An exception occured during Recipient Dto 2 Dbo matching", e.getLocalizedMessage());
             return null;
         }   
     }
@@ -81,7 +81,6 @@ public class RecipientServiceImpl implements RecipientService {
         
         if (recipients == null) {
             return null;
-            //needs custom exception
         }
         
         List<RecipientPayload> dtos = new ArrayList<>();
@@ -98,7 +97,7 @@ public class RecipientServiceImpl implements RecipientService {
             result = new RecipientPayload(recipient);
             return result;
         } catch (Exception e) {
-            logger.error("An exception occured during Order payload matching", e.getLocalizedMessage());
+            logger.error("An exception occured during Dbo to Dto Recipient payload matching", e.getLocalizedMessage());
             return null;
         }
     } 
@@ -114,7 +113,7 @@ public class RecipientServiceImpl implements RecipientService {
         if (recipient != null) {
             recipient.getOrders().forEach(o -> o.setRecipient(recipient));
             recipient.getOrders().forEach(o -> utils.applyPrice(o));
-            return mapDboToDto(recipientRepository.save(mapDtoToDbo(payload)));
+            return mapDboToDto(recipientRepository.save(recipient));
         } return null;
     }
     
