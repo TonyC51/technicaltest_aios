@@ -16,6 +16,15 @@ public class Utils {
     @Value("${banana.kg.price}")
     private double kgPrice;
     
+    @Value("${banana.quantity.min}")
+    private double quantityMin;
+    
+    @Value("${banana.quantity.max}")
+    private double quantityMax;
+    
+    @Value("${banana.pool.size}")
+    private double poolSize;
+    
     public boolean checkBusinessConditions (OrderPayload order) {
         return checkDate(order) == true &&
                 checkMultiple(order) == true &&
@@ -36,7 +45,7 @@ public class Utils {
     
     public boolean checkQuantity (OrderPayload payload) {
         // check for quantity
-        if (payload.getQuantity() < 0 || payload.getQuantity() > 10000) {
+        if (payload.getQuantity() < quantityMin || payload.getQuantity() > quantityMax) {
             throw new CustomException(ExceptionType.QUANTITY_SHOUD_BE_BETWEEN_0_AND_10000);
         }
         return true;
@@ -44,7 +53,7 @@ public class Utils {
     
     public boolean checkMultiple (OrderPayload payload) {
         // check for 25 multiple
-        if (payload.getQuantity() % 25 != 0) {
+        if (payload.getQuantity() % poolSize != 0) {
             throw new CustomException(ExceptionType.QUANTITY_SHOULD_BE_MULTIPLE_OF_25);
         }
         return true;
